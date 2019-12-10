@@ -43,10 +43,6 @@ jobs:
           /usr/share/dotnet \
           /etc/mysql \
           /etc/php
-
-
-    - name: Download repo bin file
-      run: |
         mkdir -p ~/bin
         wget 'https://storage.googleapis.com/git-repo-downloads/repo' -P ~/bin
         chmod +x ~/bin/repo
@@ -88,10 +84,10 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: hybris-boot.img
-        path: $ANDROID_ROOT/out/target/product/$DEVICE/halium-boot.img
+        path: /home/runner/work/halium/out/target/product/vince/halium-boot.img
 
     - name : Upload system image
       uses: actions/upload-artifact@master
       with:
         name: system.img
-        path: $ANDROID_ROOT/out/target/product/$DEVICE/system.img
+        path: /home/runner/work/halium/out/target/product/vince/system.img
