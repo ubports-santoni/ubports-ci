@@ -1,0 +1,97 @@
+#=================================================
+# Description: Build ubports using GitHub Actions
+# Lisence: MIT
+# Author: 0312birdzhang
+#=================================================
+
+name: Build Ubports
+
+on: 
+  release:
+    types: [published]
+  push:
+    branches: 
+      - master
+
+jobs:
+
+  build:
+    runs-on: ubuntu-16.04
+
+    env:
+      DEVICE: vince
+      VENDOR: xiaomi
+      ANDROID_ROOT: /home/runner/work/halium/
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    
+    - name: Initialization environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+        openjdk-8-jdk android-tools-adb bc \
+        bison build-essential curl flex g++-multilib \
+        gcc-multilib gnupg gperf imagemagick lib32ncurses5-dev \
+        lib32readline-dev lib32z1-dev libesd0-dev liblz4-tool \
+        libncurses5-dev libsdl1.2-dev libssl-dev libwxgtk3.0-dev \
+        libxml2 libxml2-utils lzop pngcrush rsync schedtool \
+        squashfs-tools xsltproc yasm zip zlib1g-dev git
+        sudo docker rmi `docker images -q`
+        sudo rm -rf \
+          /usr/share/dotnet \
+          /etc/mysql \
+          /etc/php
+
+
+    - name: Download repo bin file
+      run: |
+        mkdir -p ~/bin
+        wget 'https://storage.googleapis.com/git-repo-downloads/repo' -P ~/bin
+        chmod +x ~/bin/repo
+        git config --global user.name "BirdZhang"
+        git config --global user.email "0312birdzhang@gmail.com"
+
+    - name: Downloading source code
+      run: |
+        source halium.env
+        mkdir -p $ANDROID_ROOT
+        cd $ANDROID_ROOT
+        repo init -u https://github.com/Halium/android -b halium-7.1 --depth=1
+        repo sync -j8 -c --no-clone-bundle --no-tags
+    
+    - name: Clone device spec source
+      run: |
+        source halium.env
+        git clone https://github.com/ubports-on-vince/device_xiaomi_vince.git $ANDROID_ROOT/device/xiaomi/vince --depth=1
+        git clone https://github.com/ubports-on-vince/vendor_xiaomi_vince.git $ANDROID_ROOT/vendor/xiaomi/vince --depth=1
+        git clone https://github.com/ubports-on-vince/Xiaomi_Kernel_OpenSource.git -b tiffany-n-oss $ANDROID_ROOT/kernel/xiaomi/msm8953 --depth=1
+        rm -rf $ANDROID_ROOT/halium/hybris-boot
+        git clone https://github.com/Sailfish-On-Vince/hybris-boot.git $ANDROID_ROOT/halium/hybris-boot
+        git clone --recurse-submodules https://github.com/Sailfish-On-Vince/droid-hal-vince.git $ANDROID_ROOT/rpm
+        git clone https://android.googlesource.com/platform/external/curl.git -b android-7.1.2_r37 $ANDROID_ROOT/external/libcurl --depth=1
+        rm -rf $ANDROID_ROOT/halium/halium-boot
+        git clone https://github.com/ubports-on-vince/halium-boot.git $ANDROID_ROOT/halium/halium-boot
+
+    - name: Build HAL
+      run: |
+        chmod +x build-hal.sh
+        bash -x build-hal.sh
+      shell: bash
+
+    - name: SSH connection to Actions
+      if: failure()
+      uses: P3TERX/debugger-action@master
+
+    - name : Upload boot image
+      uses: actions/upload-artifact@master
+      with:
+        name: hybris-boot.img
+        path: $ANDROID_ROOT/out/target/product/$DEVICE/halium-boot.img
+
+    - name : Upload system image
+      uses: actions/upload-artifact@master
+      with:
+        name: system.img
+        path: $ANDROID_ROOT/out/target/product/$DEVICE/system.img
