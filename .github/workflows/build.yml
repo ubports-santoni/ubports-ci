@@ -83,7 +83,7 @@ jobs:
     - name : Upload boot image
       uses: actions/upload-artifact@master
       with:
-        name: hybris-boot.img
+        name: halium-boot.img
         path: /home/runner/work/halium/out/target/product/vince/halium-boot.img
 
     - name : Upload system image
