@@ -2,6 +2,7 @@
 # Description: Build ubports using GitHub Actions
 # Lisence: MIT
 # Author: 0312birdzhang
+# Credit: https://github.com/P3TERX/Actions-OpenWrt
 #=================================================
 
 name: Build Ubports
@@ -9,9 +10,6 @@ name: Build Ubports
 on: 
   release:
     types: [published]
-  push:
-    branches: 
-      - master
 
 jobs:
 
@@ -76,18 +74,14 @@ jobs:
         bash -x build-hal.sh
       shell: bash
 
-    - name: SSH connection to Actions
-      if: failure()
-      uses: P3TERX/debugger-action@master
-
     - name : Upload boot image
       uses: actions/upload-artifact@master
       with:
-        name: halium-boot.img
+        name: halium-boot image
         path: /home/runner/work/halium/out/target/product/vince/halium-boot.img
 
     - name : Upload system image
       uses: actions/upload-artifact@master
       with:
-        name: system.img
+        name: System image
         path: /home/runner/work/halium/out/target/product/vince/system.img
