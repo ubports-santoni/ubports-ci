@@ -17,8 +17,7 @@ jobs:
     runs-on: ubuntu-16.04
 
     env:
-      DEVICE: vince
-      VENDOR: xiaomi
+      DEVICE: santoni
       ANDROID_ROOT: /home/runner/work/halium/
 
     steps:
@@ -44,8 +43,8 @@ jobs:
         mkdir -p ~/bin
         wget 'https://storage.googleapis.com/git-repo-downloads/repo' -P ~/bin
         chmod +x ~/bin/repo
-        git config --global user.name "BirdZhang"
-        git config --global user.email "0312birdzhang@gmail.com"
+        git config --global user.name "UBports Redmi 4X CI"
+        git config --global user.email "thisemaildoesnotexist@exist.com"
 
     - name: Downloading source code
       run: |
@@ -58,15 +57,10 @@ jobs:
     - name: Clone device spec source
       run: |
         source halium.env
-        git clone https://github.com/ubports-on-vince/device_xiaomi_vince.git $ANDROID_ROOT/device/xiaomi/vince --depth=1
-        git clone https://github.com/ubports-on-vince/vendor_xiaomi_vince.git $ANDROID_ROOT/vendor/xiaomi/vince --depth=1
-        git clone https://github.com/ubports-on-vince/Xiaomi_Kernel_OpenSource.git -b tiffany-n-oss $ANDROID_ROOT/kernel/xiaomi/msm8953 --depth=1
-        rm -rf $ANDROID_ROOT/halium/hybris-boot
-        git clone https://github.com/Sailfish-On-Vince/hybris-boot.git $ANDROID_ROOT/halium/hybris-boot
-        git clone --recurse-submodules https://github.com/Sailfish-On-Vince/droid-hal-vince.git $ANDROID_ROOT/rpm
+        git clone https://github.com/ubports-santoni/android_device_xiaomi_santoni.git $ANDROID_ROOT/device/xiaomi/santoni --depth=1
+        git clone https://github.com/ubports-santoni/android_vendor_xiaomi_santoni.git $ANDROID_ROOT/vendor/xiaomi/santoni --depth=1
+        git clone https://github.com/ubports-santoni/android_kernel_xiaomi_santoni.git $ANDROID_ROOT/kernel/xiaomi/msm8937 --depth=1
         git clone https://android.googlesource.com/platform/external/curl.git -b android-7.1.2_r37 $ANDROID_ROOT/external/libcurl --depth=1
-        rm -rf $ANDROID_ROOT/halium/halium-boot
-        git clone https://github.com/ubports-on-vince/halium-boot.git $ANDROID_ROOT/halium/halium-boot
 
     - name: Build HAL
       run: |
@@ -78,10 +72,10 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: halium-boot image
-        path: /home/runner/work/halium/out/target/product/vince/halium-boot.img
+        path: /home/runner/work/halium/out/target/product/santoni/halium-boot.img
 
     - name : Upload system image
       uses: actions/upload-artifact@master
       with:
         name: System image
-        path: /home/runner/work/halium/out/target/product/vince/system.img
+        path: /home/runner/work/halium/out/target/product/santoni/system.img
