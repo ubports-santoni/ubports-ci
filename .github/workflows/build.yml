@@ -5,7 +5,7 @@
 # Credit: https://github.com/P3TERX/Actions-OpenWrt
 #=================================================
 
-name: Build Ubports
+name: Build System Image
 
 on: 
   push:
@@ -61,7 +61,7 @@ jobs:
       run: |
         source halium.env
         git clone https://github.com/ubports-santoni/android_device_xiaomi_santoni.git $ANDROID_ROOT/device/xiaomi/santoni --depth=1
-        git clone https://github.com/ubports-santoni/android_vendor_xiaomi_santoni.git $ANDROID_ROOT/vendor/xiaomi/santoni --depth=1
+        git clone https://github.com/ubports-santoni/android_vendor_xiaomi_santoni.git $ANDROID_ROOT/vendor/xiaomi --depth=1
         git clone https://github.com/ubports-santoni/android_kernel_xiaomi_santoni.git $ANDROID_ROOT/kernel/xiaomi/msm8937 --depth=1
         git clone https://android.googlesource.com/platform/external/curl.git -b android-7.1.2_r37 $ANDROID_ROOT/external/libcurl --depth=1
 
