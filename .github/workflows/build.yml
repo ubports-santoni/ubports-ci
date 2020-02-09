@@ -1,7 +1,8 @@
 #=================================================
 # Description: Build ubports using GitHub Actions
 # Lisence: MIT
-# Author: 0312birdzhang
+# Contributor: 0312birdzhang
+# Maintainer: Danct12
 # Credit: https://github.com/P3TERX/Actions-OpenWrt
 #=================================================
 
@@ -10,7 +11,7 @@ name: Build System Image
 on: 
   push:
     branches:
-      - master
+      - testing
   release:
     types: [published]
 
@@ -20,6 +21,7 @@ jobs:
     runs-on: ubuntu-16.04
 
     env:
+      VENDOR: xiaomi
       DEVICE: santoni
       ANDROID_ROOT: /home/runner/work/halium/
 
@@ -55,16 +57,10 @@ jobs:
         mkdir -p $ANDROID_ROOT
         cd $ANDROID_ROOT
         repo init -u https://github.com/Halium/android -b halium-7.1 --depth=1
+        mkdir -p $ANDROID_ROOT/.repo/local_manifests
+        wget https://raw.githubusercontent.com/ubports-santoni/halium-devices/halium-7.1/manifests/"$VENDOR"_"$DEVICE".xml -O $ANDROID_ROOT/.repo/local_manifests/$DEVICE.xml
         repo sync -j8 -c --no-clone-bundle --no-tags
     
-    - name: Clone device spec source
-      run: |
-        source halium.env
-        git clone https://github.com/ubports-santoni/android_device_xiaomi_santoni.git $ANDROID_ROOT/device/xiaomi/santoni --depth=1
-        git clone https://github.com/ubports-santoni/android_vendor_xiaomi_santoni.git $ANDROID_ROOT/vendor/xiaomi --depth=1
-        git clone https://github.com/ubports-santoni/android_kernel_xiaomi_santoni.git $ANDROID_ROOT/kernel/xiaomi/msm8937 --depth=1
-        git clone https://android.googlesource.com/platform/external/curl.git -b android-7.1.2_r37 $ANDROID_ROOT/external/libcurl --depth=1
-
     - name: Build HAL
       run: |
         chmod +x build-hal.sh
@@ -76,6 +72,12 @@ jobs:
       with:
         name: halium-boot image
         path: /home/runner/work/halium/out/target/product/santoni/halium-boot.img
+
+    - name : Upload recovery image
+      uses: actions/upload-artifact@master
+      with:
+        name: Recovery image
+        path: /home/runner/work/halium/out/target/product/santoni/recovery.img
 
     - name : Upload system image
       uses: actions/upload-artifact@master
