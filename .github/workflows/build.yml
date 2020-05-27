@@ -22,7 +22,7 @@ jobs:
 
     env:
       VENDOR: xiaomi
-      DEVICE: santoni
+      DEVICE: lavender
       ANDROID_ROOT: /home/runner/work/halium/
 
     steps:
@@ -48,7 +48,7 @@ jobs:
         mkdir -p ~/bin
         wget 'https://storage.googleapis.com/git-repo-downloads/repo' -P ~/bin
         chmod +x ~/bin/repo
-        git config --global user.name "UBports Redmi 4X CI"
+        git config --global user.name "UBports Redmi Note 7 CI"
         git config --global user.email "thisemaildoesnotexist@exist.com"
 
     - name: Downloading source code
@@ -56,9 +56,9 @@ jobs:
         source halium.env
         mkdir -p $ANDROID_ROOT
         cd $ANDROID_ROOT
-        repo init -u https://github.com/Halium/android -b halium-7.1 --depth=1
+        repo init -u https://github.com/Halium/android -b halium-9.0 --depth=1
         mkdir -p $ANDROID_ROOT/.repo/local_manifests
-        wget https://raw.githubusercontent.com/ubports-santoni/halium-devices/halium-7.1/manifests/"$VENDOR"_"$DEVICE".xml -O $ANDROID_ROOT/.repo/local_manifests/$DEVICE.xml
+        wget https://raw.githubusercontent.com/ubports-lavender/local_manifests/halium-9.0/$DEVICE.xml -O $ANDROID_ROOT/.repo/local_manifests/$DEVICE.xml
         repo sync -j8 -c --no-clone-bundle --no-tags
     
     - name: Build HAL
@@ -71,16 +71,10 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: halium-boot image
-        path: /home/runner/work/halium/out/target/product/santoni/halium-boot.img
-
-    - name : Upload recovery image
-      uses: actions/upload-artifact@master
-      with:
-        name: Recovery image
-        path: /home/runner/work/halium/out/target/product/santoni/recovery.img
+        path: /home/runner/work/halium/out/target/product/lavender/halium-boot.img
 
     - name : Upload system image
       uses: actions/upload-artifact@master
       with:
         name: System image
-        path: /home/runner/work/halium/out/target/product/santoni/system.img
+        path: /home/runner/work/halium/out/target/product/lavender/system.img
